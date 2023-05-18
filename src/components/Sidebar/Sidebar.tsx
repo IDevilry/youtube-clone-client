@@ -4,11 +4,20 @@ import { categories } from "../../utils/consts";
 import { type FC, useState } from "react";
 import { type ISidebarProps } from "./Sidebar.props";
 
+import { useAuth } from "../../hooks/useAuth";
+
+import AuthModal from "../AuthModal/AuthModal";
 import LoginIcon from "@mui/icons-material/Login";
-import AuthModal from "../Modal/AuthModal";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const Sidebar: FC<ISidebarProps> = ({ selectedCategory, setCategory }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const isAuth = useAuth();
+
+  const logOut = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
 
   return (
     <>
@@ -21,11 +30,14 @@ const Sidebar: FC<ISidebarProps> = ({ selectedCategory, setCategory }) => {
           flexDirection: { md: "column" },
         }}
       >
-        <button className="category-btn" onClick={() => setIsOpen(true)}>
+        <button
+          className="category-btn"
+          onClick={isAuth ? logOut : () => setIsOpen(true)}
+        >
           <span className="category-btn__icon">
-            <LoginIcon />
+            {isAuth ? <LogoutIcon /> : <LoginIcon />}
           </span>
-          <span>Войти</span>
+          <span>{isAuth ? "Выйти" : "Войти"}</span>
         </button>
         <Divider />
         {categories.map((category) => (
