@@ -1,12 +1,22 @@
-import { type FC } from "react";
+import { useEffect, type FC } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Box } from "@mui/material";
 import { Channel, Feed, Search, Video } from "./pages";
 import { Navbar } from "./components";
 import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
+import { useAppDispatch } from "./hooks/typedRedux";
+import { getMe } from "./redux/asyncThunks/getMe";
+import { getVideos } from "./redux/asyncThunks/getVideos";
 
 const App: FC = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getMe());
+    dispatch(getVideos());
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <ToastContainer

@@ -1,9 +1,7 @@
-import React from 'react'
+import { type FC } from "react";
 
-const Channel = () => {
-  return (
-    <div>Channel</div>
-  )
-}
+const Channel: FC = () => {
+  return <div></div>;
+};
 
-export default Channel
+export default Channel;

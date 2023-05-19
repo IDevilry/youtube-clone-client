@@ -65,6 +65,29 @@ a {
   transition: all 0.3s ease;
 }
 
+.category-btn:disabled {
+  background-color: rgb(209, 209, 209);
+  cursor: default;
+}
+
+.category-btn:disabled:hover {
+  background-color: rgb(209, 209, 209) !important;
+  color: black !important
+}
+
+.category-btn:disabled:hover span {
+  color: black !important
+}
+
+@keyframes spin {
+  from {
+    rotate: 360deg;
+  }
+  to {
+    rotate: 0deg;
+  }
+}
+
 @media screen and (max-width: 900px) {
   .category-btn {
     margin: 10px;

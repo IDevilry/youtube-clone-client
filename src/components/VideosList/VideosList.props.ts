@@ -1,3 +1,3 @@
-export interface IVideosListProps {
-  category: string;
-}
+import { ICategory } from "../../types";
+
+export interface IVideosListProps extends ICategory {}

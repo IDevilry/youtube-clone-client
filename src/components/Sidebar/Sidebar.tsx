@@ -44,6 +44,7 @@ const Sidebar: FC<ISidebarProps> = ({ selectedCategory, setCategory }) => {
           <button
             onClick={() => setCategory(category.name)}
             className="category-btn"
+            disabled={!isAuth && category.name !== "Главная"}
             style={{
               color: "black",
               background: category.name === selectedCategory ? "gray" : "",

@@ -1,9 +1,10 @@
 import { useState, type FC } from "react";
 import { Box, Stack } from "@mui/material";
-import { Sidebar, VideosList } from "../../components";
+import { Sidebar, VideosList } from "..";
 
 const Feed: FC = () => {
   const [selectedCategory, setCategory] = useState<string>("Главная");
+
   return (
     <Stack
       sx={{
@@ -23,7 +24,7 @@ const Feed: FC = () => {
           setCategory={setCategory}
         />
       </Box>
-      <Box>
+      <Box width="100%">
         <VideosList category={selectedCategory} />
       </Box>
     </Stack>

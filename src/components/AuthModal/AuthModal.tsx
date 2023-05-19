@@ -10,17 +10,29 @@ import {
   Button,
   Link,
   Modal,
+  Divider,
 } from "@mui/material";
 import { fetcher } from "../../api";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "../../hooks/typedRedux";
+import { setCurrentUser } from "../../redux/slices/userSlice";
+
 import { type IAuthError, type IAuthResponse } from "./AuthModal.types";
 import { type IModalProps } from "./AuthModal.props";
+
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import LoopIcon from "@mui/icons-material/Loop";
+import GoogleIcon from "@mui/icons-material/Google";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../../firebase/firebase";
 
 const AuthModal: FC<IModalProps> = ({ isOpen, setIsOpen }) => {
   const [variant, setVariant] = useState<"login" | "register">("login");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleLogin: FormEventHandler<HTMLFormElement> = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     try {
@@ -28,15 +40,18 @@ const AuthModal: FC<IModalProps> = ({ isOpen, setIsOpen }) => {
         email: data.get("email"),
         password: data.get("password"),
       });
-      localStorage.setItem("token", response.data.access_token);
+      dispatch(setCurrentUser(response.data));
       setIsOpen(false);
       toast.success("Успех!");
+      setLoading(false);
     } catch {
       toast.error("Почта или пароль введены не верно!");
+      setLoading(false);
     }
   };
 
   const handleRegister: FormEventHandler<HTMLFormElement> = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     try {
@@ -45,14 +60,39 @@ const AuthModal: FC<IModalProps> = ({ isOpen, setIsOpen }) => {
         email: data.get("email"),
         password: data.get("password"),
       });
-      localStorage.setItem("token", response.data.access_token);
+      dispatch(setCurrentUser(response.data));
       setIsOpen(false);
 
       toast.success("Успех!");
+      setLoading(false);
     } catch (e: any) {
       const error: IAuthError = e;
       toast.error(error.response.data.message.join(", "));
+      setLoading(false);
     }
+  };
+
+  const handleGoogleAuth = async () => {
+    setLoading(true);
+    signInWithPopup(auth, googleProvider)
+      .then(async (result) => {
+        const response = await fetcher.post<IAuthResponse>("auth/google", {
+          email: result.user.email,
+          name: result.user.displayName,
+          profileImage: result.user.photoURL,
+          withGoogle: true,
+          emailVerified: result.user.emailVerified,
+        });
+        dispatch(setCurrentUser(response.data));
+        setIsOpen(false);
+
+        toast.success("Успех!");
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        setLoading(false);
+      });
   };
 
   return (
@@ -134,7 +174,39 @@ const AuthModal: FC<IModalProps> = ({ isOpen, setIsOpen }) => {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              {variant === "login" ? "Войти" : "Зарегистрироваться"}
+              {loading && (
+                <LoopIcon
+                  sx={{
+                    animation: "spin 1s linear infinite",
+                  }}
+                />
+              )}
+              {!loading &&
+                (variant === "login" ? "Войти" : "Зарегистрироваться")}
+            </Button>
+            <Divider>
+              <Typography variant="body2" color="text.secondary" align="center">
+                Или войдите с помощью
+              </Typography>
+            </Divider>
+
+            <Button
+              type="button"
+              onClick={handleGoogleAuth}
+              fullWidth
+              variant="outlined"
+              sx={{ mt: 3, mb: 2, alignItems: "center" }}
+            >
+              {loading && (
+                <LoopIcon
+                  sx={{
+                    animation: "spin 1s linear infinite",
+                  }}
+                />
+              )}
+              {!loading && (
+                <GoogleIcon sx={{ ml: 1, height: "20px" }} color="primary" />
+              )}
             </Button>
             <Grid container>
               <Grid item>
